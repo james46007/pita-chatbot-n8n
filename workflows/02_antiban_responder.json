@@ -1,0 +1,230 @@
+{
+  "name": "02_antiban_responder",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "a1111111-1111-1111-1111-111111111111",
+      "name": "Entrada Sub-Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        180,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\n// Extraer y sanitizar teléfono\nconst remoteJid = input.remoteJid || '';\nconst cleanPhone = remoteJid.split('@')[0].replace(/\\D/g, '');\n\n// Configuración de Anti-baneo desde variables de entorno o defaults\nconst minRead = parseInt(process.env.ANTIBAN_MIN_READ_DELAY_MS || '1500', 10);\nconst maxRead = parseInt(process.env.ANTIBAN_MAX_READ_DELAY_MS || '3500', 10);\nconst msPerChar = parseInt(process.env.ANTIBAN_MS_PER_CHAR || '35', 10);\nconst minTyping = parseInt(process.env.ANTIBAN_MIN_TYPING_MS || '2000', 10);\nconst maxTyping = parseInt(process.env.ANTIBAN_MAX_TYPING_MS || '7000', 10);\n\n// 1. Simulación de delay de lectura (humano leyendo el mensaje que le llegó)\nconst readDelayMs = Math.floor(Math.random() * (maxRead - minRead + 1)) + minRead;\n\nreturn {\n  json: {\n    ...input,\n    cleanPhone,\n    readDelayMs,\n    msPerChar,\n    minTyping,\n    maxTyping\n  }\n};"
+      },
+      "id": "a2222222-2222-2222-2222-222222222222",
+      "name": "Calcular Delays Anti-Baneo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.readDelayMs }}",
+        "unit": "milliseconds"
+      },
+      "id": "a3333333-3333-3333-3333-333333333333",
+      "name": "Delay Lectura (Reading Delay)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        620,
+        300
+      ],
+      "webhookId": "read-delay-wait"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EVOLUTION_API_URL }}/chat/sendPresence/{{ $json.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_GLOBAL_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $json.cleanPhone }}\",\n  \"presence\": \"composing\",\n  \"delay\": 1200\n}",
+        "options": {}
+      },
+      "id": "a4444444-4444-4444-4444-444444444444",
+      "name": "Enviar Presencia: 'Escribiendo...'",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "03_reservas_handler",
+          "mode": "name"
+        },
+        "workflowInputs": {
+          "mappingMode": "passthrough"
+        }
+      },
+      "id": "a5555555-5555-5555-5555-555555555555",
+      "name": "Procesar Lógica de Negocio (Pita API)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        1060,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst replyText = input.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?';\n\n// Cálculo de typing delay en base al largo del texto de respuesta\nconst calculatedTyping = replyText.length * input.msPerChar;\nconst jitter = Math.floor(Math.random() * 800) - 400;\nconst typingDelayMs = Math.min(input.maxTyping, Math.max(input.minTyping, calculatedTyping + jitter));\n\nreturn {\n  json: {\n    ...input,\n    replyText,\n    typingDelayMs\n  }\n};"
+      },
+      "id": "a6666666-6666-6666-6666-666666666666",
+      "name": "Calcular Typing Delay",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.typingDelayMs }}",
+        "unit": "milliseconds"
+      },
+      "id": "a7777777-7777-7777-7777-777777777777",
+      "name": "Delay Escritura (Typing Delay)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1500,
+        300
+      ],
+      "webhookId": "typing-delay-wait"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $json.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_GLOBAL_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $json.cleanPhone }}\",\n  \"options\": {\n    \"delay\": 0,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": \"{{ $json.replyText }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "a8888888-8888-8888-8888-888888888888",
+      "name": "Enviar Mensaje Final (WhatsApp)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1720,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Entrada Sub-Workflow": {
+      "main": [
+        [
+          {
+            "node": "Calcular Delays Anti-Baneo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Delays Anti-Baneo": {
+      "main": [
+        [
+          {
+            "node": "Delay Lectura (Reading Delay)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delay Lectura (Reading Delay)": {
+      "main": [
+        [
+          {
+            "node": "Enviar Presencia: 'Escribiendo...'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Presencia: 'Escribiendo...'": {
+      "main": [
+        [
+          {
+            "node": "Procesar Lógica de Negocio (Pita API)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar Lógica de Negocio (Pita API)": {
+      "main": [
+        [
+          {
+            "node": "Calcular Typing Delay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Typing Delay": {
+      "main": [
+        [
+          {
+            "node": "Delay Escritura (Typing Delay)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delay Escritura (Typing Delay)": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Final (WhatsApp)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

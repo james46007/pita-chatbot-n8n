@@ -1,0 +1,191 @@
+{
+  "name": "01_Evolution_Router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "evolution-inbound",
+        "options": {}
+      },
+      "id": "11111111-1111-1111-1111-111111111111",
+      "name": "Webhook Inbound Evolution",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "webhookId": "evolution-inbound"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst event = body.event || body.type;\nconst instance = body.instance;\nconst data = body.data || {};\n\n// Extraer info de remitente\nconst isFromMe = data.key?.fromMe === true || body.key?.fromMe === true;\nconst remoteJid = data.key?.remoteJid || body.key?.remoteJid || '';\nconst pushName = data.pushName || body.pushName || 'Jugador';\n\n// Tipo de evento\nconst isConnectionUpdate = (event === 'connection.update' || event === 'CONNECTION_UPDATE');\nconst isMessageUpsert = (event === 'messages.upsert' || event === 'MESSAGES_UPSERT');\n\n// Extraer texto si existe\nlet messageText = '';\nif (data.message?.conversation) {\n  messageText = data.message.conversation;\n} else if (data.message?.extendedTextMessage?.text) {\n  messageText = data.message.extendedTextMessage.text;\n}\n\n// Detectar si es media (imagen/comprobante)\nconst isImage = !!(data.message?.imageMessage || data.message?.documentMessage);\n\nreturn {\n  json: {\n    rawEvent: event,\n    instance,\n    isConnectionUpdate,\n    isMessageUpsert,\n    isFromMe,\n    remoteJid,\n    pushName,\n    messageText,\n    isImage,\n    data\n  }\n};"
+      },
+      "id": "22222222-2222-2222-2222-222222222222",
+      "name": "Parsear y Normalizar Evento",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.isFromMe }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "33333333-3333-3333-3333-333333333333",
+      "name": "¿Mensaje propio (fromMe)?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        640,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.isConnectionUpdate }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "44444444-4444-4444-4444-444444444444",
+      "name": "¿Es Connection Update?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        860,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.PITA_API_BASE_URL }}/api/webhooks/whatsapp",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.data) }}",
+        "options": {}
+      },
+      "id": "55555555-5555-5555-5555-555555555555",
+      "name": "Reenviar Estado a Backend Pita",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "02_antiban_responder",
+          "mode": "name"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "values": [
+            {
+              "name": "instance",
+              "value": "={{ $json.instance }}"
+            },
+            {
+              "name": "remoteJid",
+              "value": "={{ $json.remoteJid }}"
+            },
+            {
+              "name": "messageText",
+              "value": "={{ $json.messageText }}"
+            },
+            {
+              "name": "pushName",
+              "value": "={{ $json.pushName }}"
+            },
+            {
+              "name": "isImage",
+              "value": "={{ $json.isImage }}"
+            }
+          ]
+        }
+      },
+      "id": "66666666-6666-6666-6666-666666666666",
+      "name": "Ejecutar Motor Anti-Ban & Negocio",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        480
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Inbound Evolution": {
+      "main": [
+        [
+          {
+            "node": "Parsear y Normalizar Evento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear y Normalizar Evento": {
+      "main": [
+        [
+          {
+            "node": "¿Mensaje propio (fromMe)?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Mensaje propio (fromMe)?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "¿Es Connection Update?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es Connection Update?": {
+      "main": [
+        [
+          {
+            "node": "Reenviar Estado a Backend Pita",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ejecutar Motor Anti-Ban & Negocio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

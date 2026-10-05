@@ -1,0 +1,35 @@
+services:
+  n8n-chatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pita_n8n_chatbot
+    restart: unless-stopped
+    ports:
+      - "${N8N_PORT:-5678}:5678"
+    environment:
+      - N8N_PORT=5678
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-America/Lima}
+      - TZ=${TZ:-America/Lima}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - N8N_EDITOR_BASE_URL=${N8N_EDITOR_BASE_URL}
+      # Variables del Sistema Pita
+      - PITA_API_BASE_URL=${PITA_API_BASE_URL}
+      - PITA_BOT_SECRET_KEY=${PITA_BOT_SECRET_KEY}
+      # Variables de Evolution API
+      - EVOLUTION_API_URL=${EVOLUTION_API_URL}
+      - EVOLUTION_GLOBAL_KEY=${EVOLUTION_GLOBAL_KEY}
+      # Configuración de Anti-baneo
+      - ANTIBAN_MIN_READ_DELAY_MS=${ANTIBAN_MIN_READ_DELAY_MS:-1500}
+      - ANTIBAN_MAX_READ_DELAY_MS=${ANTIBAN_MAX_READ_DELAY_MS:-3500}
+      - ANTIBAN_MS_PER_CHAR=${ANTIBAN_MS_PER_CHAR:-35}
+      - ANTIBAN_MIN_TYPING_MS=${ANTIBAN_MIN_TYPING_MS:-2000}
+      - ANTIBAN_MAX_TYPING_MS=${ANTIBAN_MAX_TYPING_MS:-7000}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows:/initial-workflows:ro
+
+volumes:
+  n8n_data:
+    name: pita_n8n_data
