@@ -2,8 +2,6 @@ FROM n8nio/n8n:2.29.9
 
 USER root
 
-# Instalar herramientas básicas de soporte si son necesarias
-RUN apk add --no-cache curl bash jq
 
 WORKDIR /home/node
 
