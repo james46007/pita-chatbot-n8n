@@ -68,8 +68,9 @@
       "typeVersion": 4.2,
       "position": [
         840,
-        300
-      ]
+        180
+      ],
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -177,13 +178,7 @@
             "node": "Enviar Presencia: 'Escribiendo...'",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Enviar Presencia: 'Escribiendo...'": {
-      "main": [
-        [
+          },
           {
             "node": "Procesar Lógica de Negocio (Pita API)",
             "type": "main",
