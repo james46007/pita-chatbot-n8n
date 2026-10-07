@@ -94,7 +94,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json;\nconst replyText = input.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?';\n\n// Cálculo de typing delay en base al largo del texto de respuesta\nconst calculatedTyping = replyText.length * input.msPerChar;\nconst jitter = Math.floor(Math.random() * 800) - 400;\nconst typingDelayMs = Math.min(input.maxTyping, Math.max(input.minTyping, calculatedTyping + jitter));\n\nreturn {\n  json: {\n    ...input,\n    replyText,\n    typingDelayMs\n  }\n};"
+        "jsCode": "const input = $input.first().json;\nconst replyText = input.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?';\nconst cleanPhone = input.cleanPhone || (input.remoteJid ? input.remoteJid.split('@')[0].replace(/\\D/g, '') : '');\n\nconst msPerChar = parseInt(input.msPerChar || $env.ANTIBAN_MS_PER_CHAR || '35', 10);\nconst minTyping = parseInt(input.minTyping || $env.ANTIBAN_MIN_TYPING_MS || '2000', 10);\nconst maxTyping = parseInt(input.maxTyping || $env.ANTIBAN_MAX_TYPING_MS || '7000', 10);\n\nconst calculatedTyping = replyText.length * msPerChar;\nconst jitter = Math.floor(Math.random() * 800) - 400;\nconst typingDelayMs = Math.min(maxTyping, Math.max(minTyping, calculatedTyping + jitter));\nconst typingDelaySeconds = Math.max(1, Math.round(typingDelayMs / 1000));\n\nreturn {\n  json: {\n    ...input,\n    cleanPhone,\n    replyText,\n    typingDelayMs,\n    typingDelaySeconds\n  }\n};"
       },
       "id": "a6666666-6666-6666-6666-666666666666",
       "name": "Calcular Typing Delay",
@@ -135,7 +135,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { number: $json.cleanPhone, options: { delay: 0, presence: 'composing' }, textMessage: { text: $json.replyText } } }}",
+        "jsonBody": "={{ { number: ($json.cleanPhone || ($json.remoteJid ? $json.remoteJid.split('@')[0] : '')).toString().replace(/\\D/g, ''), text: ($json.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?'), options: { delay: 0, presence: 'composing', linkPreview: false } } }}",
         "options": {}
       },
       "id": "a8888888-8888-8888-8888-888888888888",
