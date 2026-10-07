@@ -76,9 +76,18 @@
       "parameters": {
         "method": "POST",
         "url": "={{ $env.PITA_API_BASE_URL }}/api/webhooks/whatsapp",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.PITA_BOT_SECRET_KEY }}"
+            }
+          ]
+        },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify($json.data) }}",
+        "jsonBody": "={{ $json.data }}",
         "options": {}
       },
       "id": "55555555-5555-5555-5555-555555555555",

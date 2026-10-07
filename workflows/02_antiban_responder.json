@@ -59,7 +59,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"number\": \"{{ $json.cleanPhone }}\",\n  \"presence\": \"composing\",\n  \"delay\": 1200\n}",
+        "jsonBody": "={{ { number: $json.cleanPhone, presence: 'composing', delay: 1200 } }}",
         "options": {}
       },
       "id": "a4444444-4444-4444-4444-444444444444",
@@ -93,7 +93,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json;\nconst replyText = input.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?';\n\n// Cálculo de typing delay en base al largo del texto de respuesta\nconst calculatedTyping = replyText.length * input.msPerChar;\nconst jitter = Math.floor(Math.random() * 800) - 400;\nconst typingDelayMs = Math.min(input.maxTyping, Math.max(input.minTyping, calculatedTyping + jitter));\n\nreturn {\n  json: {\n    ...input,\n    replyText,\n    typingDelayMs\n  }\n};"
+        "jsCode": "const input = $input.first().json;\nconst replyText = input.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?';\n\nconst msPerChar = parseInt(input.msPerChar || '35', 10);\nconst minTyping = parseInt(input.minTyping || '2000', 10);\nconst maxTyping = parseInt(input.maxTyping || '7000', 10);\n\n// Cálculo de typing delay en base al largo del texto de respuesta\nconst calculatedTyping = replyText.length * msPerChar;\nconst jitter = Math.floor(Math.random() * 800) - 400;\nconst typingDelayMs = Math.min(maxTyping, Math.max(minTyping, calculatedTyping + jitter));\n\nreturn {\n  json: {\n    ...input,\n    replyText,\n    typingDelayMs\n  }\n};"
       },
       "id": "a6666666-6666-6666-6666-666666666666",
       "name": "Calcular Typing Delay",
@@ -134,7 +134,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"number\": \"{{ $json.cleanPhone }}\",\n  \"options\": {\n    \"delay\": 0,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": \"{{ $json.replyText }}\"\n  }\n}",
+        "jsonBody": "={{ { number: $json.cleanPhone, options: { delay: 0, presence: 'composing' }, textMessage: { text: $json.replyText } } }}",
         "options": {}
       },
       "id": "a8888888-8888-8888-8888-888888888888",

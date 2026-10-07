@@ -34,7 +34,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer ={{ $env.PITA_BOT_SECRET_KEY }}"
+              "value": "=Bearer {{ $env.PITA_BOT_SECRET_KEY }}"
             }
           ]
         },
