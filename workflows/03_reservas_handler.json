@@ -49,7 +49,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const res = $input.first().json || {};\nconst triggerData = $('Entrada Handler Negocio').first().json;\n\nconst replyText = res.replyText ||\n  'Disculpa, tuve un problema técnico. Escribe *menu* para ver las opciones.';\n\nreturn {\n  json: {\n    ...triggerData,\n    replyText,\n    interactive: res.interactive || null\n  }\n};"
+        "jsCode": "const res = $input.first().json || {};\nconst triggerData = $('Entrada Handler Negocio').first().json;\n\nconst shouldReply = res.shouldReply === true && (!!res.replyText || !!res.interactive);\n\nreturn {\n  json: {\n    ...triggerData,\n    shouldReply,\n    replyText: res.replyText || '',\n    interactive: res.interactive || null\n  }\n};"
       },
       "id": "b3333333-3333-3333-3333-333333333333",
       "name": "Armar Respuesta",

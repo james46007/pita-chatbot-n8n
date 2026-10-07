@@ -67,8 +67,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        840,
-        180
+        1300,
+        200
       ],
       "onError": "continueRegularOutput"
     },
@@ -88,7 +88,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
       "position": [
-        1060,
+        840,
         300
       ]
     },
@@ -101,7 +101,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1280,
+        1520,
         300
       ]
     },
@@ -115,7 +115,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1500,
+        1740,
         300
       ],
       "webhookId": "typing-delay-wait"
@@ -143,7 +143,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2160,
+        2240,
         420
       ]
     },
@@ -175,7 +175,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1720,
+        1960,
         300
       ]
     },
@@ -202,10 +202,43 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2160,
+        2240,
         180
       ],
       "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "dc404aab-a90a-46c6-a3ac-87c977f10df0",
+              "leftValue": "={{ $json.shouldReply }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a215f7b7-daf7-4f1d-b2ff-9d5667cf7340",
+      "name": "¿Debe responder?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1080,
+        300
+      ]
     }
   ],
   "connections": {
@@ -235,11 +268,6 @@
       "main": [
         [
           {
-            "node": "Enviar Presencia: 'Escribiendo...'",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "Procesar Lógica de Negocio (Pita API)",
             "type": "main",
             "index": 0
@@ -251,7 +279,7 @@
       "main": [
         [
           {
-            "node": "Calcular Typing Delay",
+            "node": "¿Debe responder?",
             "type": "main",
             "index": 0
           }
@@ -308,6 +336,23 @@
             "index": 0
           }
         ]
+      ]
+    },
+    "¿Debe responder?": {
+      "main": [
+        [
+          {
+            "node": "Enviar Presencia: 'Escribiendo...'",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Calcular Typing Delay",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
       ]
     }
   },
