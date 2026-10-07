@@ -18,7 +18,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json;\n\n// Extraer y sanitizar teléfono\nconst remoteJid = input.remoteJid || '';\nconst cleanPhone = remoteJid.split('@')[0].replace(/\\D/g, '');\n\n// Lectura segura de variables de entorno con fallback en caso de sandbox restrictivo\nlet envVars = {};\ntry {\n  if (typeof $env !== 'undefined') {\n    envVars = $env;\n  }\n} catch (e) {\n  envVars = {};\n}\n\nconst minRead = parseInt((envVars && envVars.ANTIBAN_MIN_READ_DELAY_MS) || '1500', 10);\nconst maxRead = parseInt((envVars && envVars.ANTIBAN_MAX_READ_DELAY_MS) || '3500', 10);\nconst msPerChar = parseInt((envVars && envVars.ANTIBAN_MS_PER_CHAR) || '35', 10);\nconst minTyping = parseInt((envVars && envVars.ANTIBAN_MIN_TYPING_MS) || '2000', 10);\nconst maxTyping = parseInt((envVars && envVars.ANTIBAN_MAX_TYPING_MS) || '7000', 10);\n\n// 1. Simulación de delay de lectura (humano leyendo el mensaje que le llegó)\nconst readDelayMs = Math.floor(Math.random() * (maxRead - minRead + 1)) + minRead;\n\nreturn {\n  json: {\n    ...input,\n    cleanPhone,\n    readDelayMs,\n    msPerChar,\n    minTyping,\n    maxTyping\n  }\n};"
+        "jsCode": "const input = $input.first().json;\n\n// Extraer y sanitizar teléfono\nconst remoteJid = input.remoteJid || '';\nconst cleanPhone = remoteJid.split('@')[0].replace(/\\D/g, '');\n\n// Configuración de Anti-baneo desde variables de entorno o defaults\nconst minRead = parseInt(process.env.ANTIBAN_MIN_READ_DELAY_MS || '1500', 10);\nconst maxRead = parseInt(process.env.ANTIBAN_MAX_READ_DELAY_MS || '3500', 10);\nconst msPerChar = parseInt(process.env.ANTIBAN_MS_PER_CHAR || '35', 10);\nconst minTyping = parseInt(process.env.ANTIBAN_MIN_TYPING_MS || '2000', 10);\nconst maxTyping = parseInt(process.env.ANTIBAN_MAX_TYPING_MS || '7000', 10);\n\n// 1. Simulación de delay de lectura (humano leyendo el mensaje que le llegó)\nconst readDelayMs = Math.floor(Math.random() * (maxRead - minRead + 1)) + minRead;\nconst readDelaySeconds = Math.max(1, Math.round(readDelayMs / 1000));\n\nreturn {\n  json: {\n    ...input,\n    cleanPhone,\n    readDelayMs,\n    readDelaySeconds,\n    msPerChar,\n    minTyping,\n    maxTyping\n  }\n};"
       },
       "id": "a2222222-2222-2222-2222-222222222222",
       "name": "Calcular Delays Anti-Baneo",
@@ -31,8 +31,8 @@
     },
     {
       "parameters": {
-        "amount": "={{ $json.readDelayMs }}",
-        "unit": "milliseconds"
+        "amount": "={{ $json.readDelaySeconds || Math.max(1, Math.round(($json.readDelayMs || 2000) / 1000)) }}",
+        "unit": "seconds"
       },
       "id": "a3333333-3333-3333-3333-333333333333",
       "name": "Delay Lectura (Reading Delay)",
@@ -93,7 +93,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const input = $input.first().json;\nconst replyText = input.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?';\n\nconst msPerChar = parseInt(input.msPerChar || '35', 10);\nconst minTyping = parseInt(input.minTyping || '2000', 10);\nconst maxTyping = parseInt(input.maxTyping || '7000', 10);\n\n// Cálculo de typing delay en base al largo del texto de respuesta\nconst calculatedTyping = replyText.length * msPerChar;\nconst jitter = Math.floor(Math.random() * 800) - 400;\nconst typingDelayMs = Math.min(maxTyping, Math.max(minTyping, calculatedTyping + jitter));\n\nreturn {\n  json: {\n    ...input,\n    replyText,\n    typingDelayMs\n  }\n};"
+        "jsCode": "const input = $input.first().json;\nconst replyText = input.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?';\n\n// Cálculo de typing delay en base al largo del texto de respuesta\nconst calculatedTyping = replyText.length * input.msPerChar;\nconst jitter = Math.floor(Math.random() * 800) - 400;\nconst typingDelayMs = Math.min(input.maxTyping, Math.max(input.minTyping, calculatedTyping + jitter));\n\nreturn {\n  json: {\n    ...input,\n    replyText,\n    typingDelayMs\n  }\n};"
       },
       "id": "a6666666-6666-6666-6666-666666666666",
       "name": "Calcular Typing Delay",
@@ -106,8 +106,8 @@
     },
     {
       "parameters": {
-        "amount": "={{ $json.typingDelayMs }}",
-        "unit": "milliseconds"
+        "amount": "={{ $json.typingDelaySeconds || Math.max(1, Math.round(($json.typingDelayMs || 3000) / 1000)) }}",
+        "unit": "seconds"
       },
       "id": "a7777777-7777-7777-7777-777777777777",
       "name": "Delay Escritura (Typing Delay)",
