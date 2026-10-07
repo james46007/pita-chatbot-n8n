@@ -18,17 +18,8 @@
     },
     {
       "parameters": {
-        "method": "GET",
-        "url": "={{ $env.PITA_API_BASE_URL }}/api/bot/complejo",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "instance",
-              "value": "={{ $json.instance }}"
-            }
-          ]
-        },
+        "method": "POST",
+        "url": "={{ $env.PITA_API_BASE_URL }}/api/bot/chat",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -38,23 +29,30 @@
             }
           ]
         },
-        "options": {}
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { instance: $json.instance, phone: ($json.remoteJid || '').split('@')[0], pushName: $json.pushName, text: $json.messageText, listRowId: $json.listRowId || null, isImage: !!$json.isImage } }}",
+        "options": {
+          "timeout": 45000
+        }
       },
       "id": "b2222222-2222-2222-2222-222222222222",
-      "name": "Consultar Complejo en Pita",
+      "name": "Chat IA en Pita",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
         420,
         300
-      ]
+      ],
+      "onError": "continueRegularOutput",
+      "retryOnFail": false
     },
     {
       "parameters": {
-        "jsCode": "const complejoData = $input.first().json;\n// Obtener datos del trigger passthrough\nconst triggerData = $('Entrada Handler Negocio').first().json;\n\nconst nombreComplejo = complejoData.name || 'nuestro complejo deportivo';\nconst pushName = triggerData.pushName || 'amigo';\nconst isImage = triggerData.isImage;\nconst msg = (triggerData.messageText || '').toLowerCase().trim();\n\nlet reply = '';\n\nif (isImage) {\n  reply = `¡Gracias ${pushName}! 📄 Hemos recibido tu comprobante de pago. Nuestro equipo lo verificará y te confirmará la reserva en unos minutos.`;\n} else if (msg.includes('hola') || msg.includes('buenas') || msg.includes('precio') || msg.includes('cancha')) {\n  reply = `¡Hola ${pushName}! 👋 Bienvenido a *${nombreComplejo}*.\n\nPara consultar la disponibilidad de canchas y reservar, indícanos:\n1️⃣ La fecha que buscas (ej. hoy, mañana o YYYY-MM-DD)\n2️⃣ El tipo de cancha o deporte\n\n¿En qué fecha deseas jugar?`;\n} else {\n  reply = `Hola ${pushName}, gracias por comunicarte con *${nombreComplejo}*. Estamos procesando tu mensaje. Si deseas reservar, por favor indícanos la fecha y hora de tu preferencia.`;\n}\n\nreturn {\n  json: {\n    ...triggerData,\n    complejo: complejoData,\n    replyText: reply\n  }\n};"
+        "jsCode": "const res = $input.first().json || {};\nconst triggerData = $('Entrada Handler Negocio').first().json;\n\nconst replyText = res.replyText ||\n  'Disculpa, tuve un problema técnico. Escribe *menu* para ver las opciones.';\n\nreturn {\n  json: {\n    ...triggerData,\n    replyText,\n    interactive: res.interactive || null\n  }\n};"
       },
       "id": "b3333333-3333-3333-3333-333333333333",
-      "name": "Interpretar y Armar Respuesta",
+      "name": "Armar Respuesta",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -68,18 +66,18 @@
       "main": [
         [
           {
-            "node": "Consultar Complejo en Pita",
+            "node": "Chat IA en Pita",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Consultar Complejo en Pita": {
+    "Chat IA en Pita": {
       "main": [
         [
           {
-            "node": "Interpretar y Armar Respuesta",
+            "node": "Armar Respuesta",
             "type": "main",
             "index": 0
           }
