@@ -1,6 +1,7 @@
 {
-  "id": "AntibanResponder02",
+  "id": "PitaAntibanWf002",
   "name": "02_antiban_responder",
+  "active": true,
   "nodes": [
     {
       "parameters": {
@@ -74,8 +75,8 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "03_reservas_handler",
-          "mode": "name"
+          "value": "PitaReservasWf03",
+          "mode": "id"
         },
         "workflowInputs": {
           "mappingMode": "passthrough"

@@ -1,6 +1,7 @@
 {
-  "id": "ReservasHandler03",
+  "id": "PitaReservasWf03",
   "name": "03_reservas_handler",
+  "active": true,
   "nodes": [
     {
       "parameters": {
