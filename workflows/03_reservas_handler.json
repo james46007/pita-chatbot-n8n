@@ -31,7 +31,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { instance: $json.instance, phone: ($json.remoteJid || '').split('@')[0], pushName: $json.pushName, text: $json.messageText, listRowId: $json.listRowId || null, isImage: !!$json.isImage } }}",
+        "jsonBody": "={{ { instance: $json.instance, phone: ($json.remoteJid || '').split('@')[0], pushName: $json.pushName, text: $json.messageText, listRowId: $json.listRowId || null, isImage: !!$json.isImage, messageId: $json.messageId || null, mediaBase64: $json.mediaBase64 || null } }}",
         "options": {
           "timeout": 45000
         }
