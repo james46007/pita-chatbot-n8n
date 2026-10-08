@@ -35,18 +35,31 @@
     {
       "parameters": {
         "conditions": {
-          "boolean": [
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
             {
-              "value1": "={{ $json.isFromMe }}",
-              "value2": true
+              "id": "c1f7a01a-8888-4444-9999-111111111111",
+              "leftValue": "={{ $json.isFromMe }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
             }
-          ]
-        }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
       "id": "33333333-3333-3333-3333-333333333333",
       "name": "¿Mensaje propio (fromMe)?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
+      "typeVersion": 2.2,
       "position": [
         640,
         300
@@ -55,18 +68,31 @@
     {
       "parameters": {
         "conditions": {
-          "boolean": [
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
             {
-              "value1": "={{ $json.isConnectionUpdate }}",
-              "value2": true
+              "id": "c2f7a01a-8888-4444-9999-222222222222",
+              "leftValue": "={{ $json.isConnectionUpdate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
             }
-          ]
-        }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
       },
       "id": "44444444-4444-4444-4444-444444444444",
       "name": "¿Es Connection Update?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 1,
+      "typeVersion": 2.2,
       "position": [
         860,
         380
@@ -87,7 +113,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ $json.data }}",
+        "jsonBody": "={{ { event: $json.rawEvent, instance: $json.instance, data: $json.data } }}",
         "options": {}
       },
       "id": "55555555-5555-5555-5555-555555555555",
