@@ -140,6 +140,10 @@
             {
               "name": "mediaBase64",
               "value": "={{ $json.mediaBase64 }}"
+            },
+            {
+              "name": "rawMessage",
+              "value": "={{ $json.data }}"
             }
           ]
         }

@@ -18,6 +18,92 @@
     },
     {
       "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1111111-1111-1111-1111-111111111111",
+              "leftValue": "={{ $json.isImage }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c2222222-2222-2222-2222-222222222222",
+              "leftValue": "={{ $json.mediaBase64 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "isEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c3333333-3333-3333-3333-333333333333",
+      "name": "¿Tiene Imagen Sin Base64?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EVOLUTION_API_URL }}/message/downloadMedia/{{ $json.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_GLOBAL_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { message: $json.rawMessage || { key: { id: $json.messageId } }, convertToMp4: false } }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "c4444444-4444-4444-4444-444444444444",
+      "name": "Descargar Media Evolution",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mediaRes = $input.first().json || {};\nconst triggerData = $('Entrada Handler Negocio').first().json;\n\nlet downloadedBase64 = mediaRes.base64 || mediaRes.data?.base64 || '';\nif (downloadedBase64 && !downloadedBase64.startsWith('data:')) {\n  const mimetype = mediaRes.mimetype || 'image/jpeg';\n  downloadedBase64 = `data:${mimetype};base64,${downloadedBase64}`;\n}\n\nreturn {\n  json: {\n    ...triggerData,\n    mediaBase64: downloadedBase64 || triggerData.mediaBase64 || null\n  }\n};"
+      },
+      "id": "c5555555-5555-5555-5555-555555555555",
+      "name": "Normalizar Base64 Media",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        200
+      ]
+    },
+    {
+      "parameters": {
         "method": "POST",
         "url": "={{ $env.PITA_API_BASE_URL }}/api/bot/chat",
         "sendHeaders": true,
@@ -41,7 +127,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        420,
+        1080,
         300
       ],
       "onError": "continueRegularOutput",
@@ -56,13 +142,53 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        640,
+        1300,
         300
       ]
     }
   ],
   "connections": {
     "Entrada Handler Negocio": {
+      "main": [
+        [
+          {
+            "node": "¿Tiene Imagen Sin Base64?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Tiene Imagen Sin Base64?": {
+      "main": [
+        [
+          {
+            "node": "Descargar Media Evolution",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Chat IA en Pita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar Media Evolution": {
+      "main": [
+        [
+          {
+            "node": "Normalizar Base64 Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar Base64 Media": {
       "main": [
         [
           {
