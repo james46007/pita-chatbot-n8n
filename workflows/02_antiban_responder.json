@@ -150,30 +150,19 @@
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "loose"
-          },
-          "conditions": [
+          "string": [
             {
-              "id": "8deb26a4-6dd7-4f27-8ab2-be4238b20cca",
-              "leftValue": "={{ $json.interactive ? 'list' : '' }}",
-              "rightValue": "list",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
+              "value1": "={{ $json.interactive ? 'list' : '' }}",
+              "value2": "list",
+              "operation": "equal"
             }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
+          ]
+        }
       },
       "id": "fd53aa3a-4803-42ec-847b-6c7415485e41",
       "name": "¿Respuesta con Lista?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
+      "typeVersion": 1,
       "position": [
         1960,
         300
@@ -210,31 +199,18 @@
     {
       "parameters": {
         "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "loose"
-          },
-          "conditions": [
+          "boolean": [
             {
-              "id": "dc404aab-a90a-46c6-a3ac-87c977f10df0",
-              "leftValue": "={{ $json.shouldReply }}",
-              "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "true",
-                "singleValue": true
-              }
+              "value1": "={{ $json.shouldReply }}",
+              "value2": true
             }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
+          ]
+        }
       },
       "id": "a215f7b7-daf7-4f1d-b2ff-9d5667cf7340",
       "name": "¿Debe responder?",
       "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
+      "typeVersion": 1,
       "position": [
         1080,
         300
