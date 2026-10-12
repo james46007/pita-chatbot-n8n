@@ -59,7 +59,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { number: $json.cleanPhone, presence: 'composing', delay: 1200 } }}",
+        "jsonBody": "={{ { number: ($json.remoteJid && $json.remoteJid.includes('@lid')) ? $json.remoteJid : $json.cleanPhone, presence: 'composing', delay: 1200 } }}",
         "options": {}
       },
       "id": "a4444444-4444-4444-4444-444444444444",
@@ -135,7 +135,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { number: ($json.cleanPhone || ($json.remoteJid ? $json.remoteJid.split('@')[0] : '')).toString().replace(/\\D/g, ''), text: ($json.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?'), options: { delay: 0, presence: 'composing', linkPreview: false } } }}",
+        "jsonBody": "={{ { number: ($json.remoteJid && $json.remoteJid.includes('@lid')) ? $json.remoteJid : ($json.cleanPhone || ($json.remoteJid ? $json.remoteJid.split('@')[0] : '')).toString().replace(/\\D/g, ''), text: ($json.replyText || '¡Hola! ¿En qué horario deseas reservar tu cancha?'), options: { delay: 0, presence: 'composing', linkPreview: false } } }}",
         "options": {}
       },
       "id": "a8888888-8888-8888-8888-888888888888",
@@ -194,7 +194,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { number: $json.cleanPhone, title: $json.interactive.title, description: $json.interactive.description, buttonText: $json.interactive.buttonText, footerText: $json.interactive.footerText, values: $json.interactive.sections.map(s => ({ title: s.title, rows: s.rows })) } }}",
+        "jsonBody": "={{ { number: ($json.remoteJid && $json.remoteJid.includes('@lid')) ? $json.remoteJid : $json.cleanPhone, title: $json.interactive.title, description: $json.interactive.description, buttonText: $json.interactive.buttonText, footerText: $json.interactive.footerText, values: $json.interactive.sections.map(s => ({ title: s.title, rows: s.rows })) } }}",
         "options": {}
       },
       "id": "d485a0d0-8a93-47e4-a87b-b4d1936b053d",
