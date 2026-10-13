@@ -113,24 +113,12 @@
             "node": "1. Disparar Recordatorios de Partido",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "1. Disparar Recordatorios de Partido": {
-      "main": [
-        [
+          },
           {
             "node": "2. Disparar Avisos de Pago por Vencer",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "2. Disparar Avisos de Pago por Vencer": {
-      "main": [
-        [
+          },
           {
             "node": "3. Procesar Cola WhatsApp Pendiente",
             "type": "main",

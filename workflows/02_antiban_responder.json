@@ -215,6 +215,62 @@
         1080,
         300
       ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EVOLUTION_API_URL }}/chat/markMessageAsRead/{{ $json.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_GLOBAL_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { readMessages: [ { id: $json.messageId, fromMe: false, remoteJid: $json.remoteJid } ] } }}",
+        "options": {}
+      },
+      "id": "a9999999-9999-9999-9999-999999999999",
+      "name": "Marcar Mensaje como Leído",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        730,
+        300
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EVOLUTION_API_URL }}/chat/sendPresence/{{ $json.instance }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.EVOLUTION_GLOBAL_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { number: ($json.remoteJid && $json.remoteJid.includes('@lid')) ? $json.remoteJid : $json.cleanPhone, presence: 'paused', delay: 0 } }}",
+        "options": {}
+      },
+      "id": "baaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "name": "Pausar Presencia",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2500,
+        300
+      ],
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -241,6 +297,17 @@
       ]
     },
     "Delay Lectura (Reading Delay)": {
+      "main": [
+        [
+          {
+            "node": "Marcar Mensaje como Leído",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar Mensaje como Leído": {
       "main": [
         [
           {
@@ -304,10 +371,27 @@
     },
     "Enviar Lista (WhatsApp)": {
       "main": [
-        [],
+        [
+          {
+            "node": "Pausar Presencia",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "Enviar Mensaje Final (WhatsApp)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensaje Final (WhatsApp)": {
+      "main": [
+        [
+          {
+            "node": "Pausar Presencia",
             "type": "main",
             "index": 0
           }

@@ -91,8 +91,8 @@ El contenedor compilará la imagen, iniciará la base de datos interna de n8n, i
 
 En tu panel de Evolution API o en la creación de cada instancia:
 - **Webhook URL**: `https://<TU_DOMINIO_N8N>/webhook/evolution-inbound`
-- **Events**: Activar `MESSAGES_UPSERT` y `CONNECTION_UPDATE`.
-- **Webhook by Events**: Habilitado.
+- **Events**: Activar `MESSAGES_UPSERT` y `CONNECTION_UPDATE` (opcional `CONTACTS_UPDATE`).
+- **Webhook by Events**: **Deshabilitado (`false`)** (Crucial: si se activa, Evolution API agrega el nombre del evento a la URL y rompe el endpoint con 404).
 
 ---
 

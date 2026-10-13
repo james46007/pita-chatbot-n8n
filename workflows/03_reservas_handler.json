@@ -118,7 +118,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const res = $input.first().json || {};\nconst triggerData = $('Entrada Handler Negocio').first().json;\n\nconst shouldReply = res.shouldReply === true && (!!res.replyText || !!res.interactive);\n\nreturn {\n  json: {\n    ...triggerData,\n    shouldReply,\n    replyText: res.replyText || '',\n    interactive: res.interactive || null\n  }\n};"
+        "jsCode": "const res = $input.first().json || {};\nconst triggerData = $('Entrada Handler Negocio').first().json;\n\n// Respuesta exitosa normal de Pita\nlet shouldReply = res.shouldReply === true && (!!res.replyText || !!res.interactive);\nlet replyText = res.replyText || '';\nlet interactive = res.interactive || null;\n\n// Fallback de contingencia (Punto 4): si la llamada a Pita fallo o dio timeout\nconst hasError = !!res.error || !!res.message || res.statusCode >= 400;\nif (hasError && !shouldReply) {\n  shouldReply = true;\n  replyText = '⚠️ En este momento tenemos una pequeña intermitencia técnica en el sistema de reservas.\\n\\nPor favor intenta nuevamente en unos minutos o comunícate directamente con recepción para apartar tu turno.';\n  interactive = null;\n}\n\nreturn {\n  json: {\n    ...triggerData,\n    shouldReply,\n    replyText,\n    interactive\n  }\n};"
       },
       "id": "b3333333-3333-3333-3333-333333333333",
       "name": "Armar Respuesta",
