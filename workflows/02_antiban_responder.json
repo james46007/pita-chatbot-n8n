@@ -300,6 +300,11 @@
       "main": [
         [
           {
+            "node": "Procesar Lógica de Negocio (Pita API)",
+            "type": "main",
+            "index": 0
+          },
+          {
             "node": "Marcar Mensaje como Leído",
             "type": "main",
             "index": 0
@@ -309,13 +314,7 @@
     },
     "Marcar Mensaje como Leído": {
       "main": [
-        [
-          {
-            "node": "Procesar Lógica de Negocio (Pita API)",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Procesar Lógica de Negocio (Pita API)": {
