@@ -83,6 +83,7 @@ El contenedor compilará la imagen, iniciará la base de datos interna de n8n, i
 | `EVOLUTION_GLOBAL_KEY` | Clave API Global de Evolution | `adminkey123` |
 | `N8N_ENCRYPTION_KEY` | Clave de cifrado interna de n8n (mínimo 32 caracteres) | `genera_un_hash_aleatorio_aqui` |
 | `WEBHOOK_URL` | URL pública donde n8n recibirá los webhooks | `https://bot.tudominio.com` |
+| `DATABASE_URL` | (Opcional) Cadena PostgreSQL de persistencia para n8n | `postgresql://user:pass@host:5432/db?sslmode=require` |
 
 ---
 
