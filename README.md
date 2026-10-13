@@ -107,6 +107,7 @@ En tu panel de Evolution API o en la creación de cada instancia:
 ├── workflows/                  # Workflows exportados en formato JSON
 │   ├── 01_evolution_router.json
 │   ├── 02_antiban_responder.json
-│   └── 03_reservas_handler.json
+│   ├── 03_reservas_handler.json
+│   └── 04_cron_scheduler.json
 └── docs/                       # Documentación adicional y diagramas
 ```
