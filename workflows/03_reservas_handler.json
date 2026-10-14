@@ -88,7 +88,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.PITA_API_BASE_URL }}/api/bot/chat",
+        "url": "={{ ($env.PITA_API_BASE_URL || '').replace(/\\/+$/, '') }}/api/bot/chat",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -100,7 +100,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { instance: $json.instance, phone: ($json.remoteJid || '').split('@')[0], pushName: $json.pushName, text: $json.messageText, listRowId: $json.listRowId || null, isImage: !!$json.isImage, messageId: $json.messageId || null, mediaBase64: $json.mediaBase64 || null } }}",
+        "jsonBody": "={{ { instance: $json.instance, phone: ($json.cleanPhone || ($json.remoteJidAlt ? $json.remoteJidAlt.split('@')[0] : '') || ($json.remoteJid || '').split('@')[0]).replace(/\\D/g, ''), pushName: $json.pushName, text: $json.messageText, listRowId: $json.listRowId || null, isImage: !!$json.isImage, messageId: $json.messageId || null, mediaBase64: $json.mediaBase64 || null } }}",
         "options": {
           "timeout": 45000
         }

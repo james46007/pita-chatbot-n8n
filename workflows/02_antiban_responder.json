@@ -47,7 +47,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL }}/chat/sendPresence/{{ $json.instance }}",
+        "url": "={{ ($env.EVOLUTION_API_URL || '').replace(/\\/+$/, '') }}/chat/sendPresence/{{ $json.instance }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -123,7 +123,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendText/{{ $json.instance }}",
+        "url": "={{ ($env.EVOLUTION_API_URL || '').replace(/\\/+$/, '') }}/message/sendText/{{ $json.instance }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -171,7 +171,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL }}/message/sendList/{{ $json.instance }}",
+        "url": "={{ ($env.EVOLUTION_API_URL || '').replace(/\\/+$/, '') }}/message/sendList/{{ $json.instance }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -183,7 +183,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ { number: ($json.remoteJid && $json.remoteJid.includes('@lid')) ? $json.remoteJid : $json.cleanPhone, title: $json.interactive.title, description: $json.interactive.description, buttonText: $json.interactive.buttonText, footerText: $json.interactive.footerText, values: $json.interactive.sections.map(s => ({ title: s.title, rows: s.rows })) } }}",
+        "jsonBody": "={{ { number: ($json.remoteJid && $json.remoteJid.includes('@lid')) ? $json.remoteJid : $json.cleanPhone, title: $json.interactive.title, description: $json.interactive.description, buttonText: $json.interactive.buttonText, footerText: $json.interactive.footerText, sections: $json.interactive.sections.map(s => ({ title: s.title, rows: s.rows })), values: $json.interactive.sections.map(s => ({ title: s.title, rows: s.rows })) } }}",
         "options": {}
       },
       "id": "d485a0d0-8a93-47e4-a87b-b4d1936b053d",
@@ -219,7 +219,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL }}/chat/markMessageAsRead/{{ $json.instance }}",
+        "url": "={{ ($env.EVOLUTION_API_URL || '').replace(/\\/+$/, '') }}/chat/markMessageAsRead/{{ $json.instance }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -247,7 +247,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.EVOLUTION_API_URL }}/chat/sendPresence/{{ $json.instance }}",
+        "url": "={{ ($env.EVOLUTION_API_URL || '').replace(/\\/+$/, '') }}/chat/sendPresence/{{ $json.instance }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
